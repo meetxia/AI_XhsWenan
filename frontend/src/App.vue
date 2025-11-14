@@ -101,18 +101,28 @@
           <div class="flex-1 overflow-hidden">
             
             <!-- AI生成标签页 -->
-            <div v-show="activeTab === 'generate'" class="h-full p-6 md:p-10 overflow-y-auto">
+            <div v-show="activeTab === 'generate'" class="h-full overflow-y-auto">
+              <!-- 生成进度展示 -->
+              <div v-if="loading" class="h-full flex items-center justify-center">
+                <GenerationProgress 
+                  ref="progressRef"
+                  :isMultiRound="advancedParams.enableMultiRound" 
+                />
+              </div>
+              
               <!-- 占位符 -->
-              <div v-if="!result.title && !loading" class="m-auto text-center text-gray-500 dark:text-gray-400">
-                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h2 class="mt-2 text-lg font-medium">// 等待生成</h2>
-                <p class="mt-1 text-sm">在左侧选择产品和角度后点击生成...</p>
+              <div v-else-if="!result.title" class="h-full flex items-center justify-center p-6 md:p-10">
+                <div class="text-center text-gray-500 dark:text-gray-400">
+                  <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <h2 class="mt-2 text-lg font-medium">// 等待生成</h2>
+                  <p class="mt-1 text-sm">在左侧选择产品和角度后点击生成...</p>
+                </div>
               </div>
               
               <!-- 结果展示区 -->
-              <div v-if="result.title" class="h-full flex flex-col">
+              <div v-else class="h-full p-6 md:p-10">
                 <ResultDisplay :result="result" :loading="loading" />
               </div>
             </div>
@@ -173,6 +183,7 @@ import HistoryPanel from './components/HistoryPanel.vue'
 import HistoryDetail from './components/HistoryDetail.vue'
 import MultiRoundHistoryPanel from './components/MultiRoundHistoryPanel.vue'
 import MultiRoundHistoryDetail from './components/MultiRoundHistoryDetail.vue'
+import GenerationProgress from './components/GenerationProgress.vue'
 import { generateEnhanced } from './api/index.js'
 
 // 响应式数据
@@ -197,6 +208,7 @@ const selectedHistoryRecord = ref(null)
 const selectedMultiRoundRecord = ref(null)
 const historyPanelRef = ref(null)
 const multiRoundHistoryPanelRef = ref(null)
+const progressRef = ref(null)
 
 // 窗口宽度响应式计算
 const windowWidth = ref(window.innerWidth)
@@ -333,6 +345,15 @@ async function onGenerate() {
     }
     
     console.log('✅ AI生成成功!')
+    
+    // 标记进度完成
+    if (progressRef.value) {
+      progressRef.value.complete()
+    }
+    
+    // 延迟一小段时间显示完成状态，然后显示结果
+    await new Promise(resolve => setTimeout(resolve, 800))
+    
     result.value = aiData
     
     // 自动切换到生成结果标签页

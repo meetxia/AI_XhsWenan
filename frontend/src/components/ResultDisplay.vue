@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col">
+  <div class="h-full flex flex-col animate-fade-in">
     <!-- 操作栏：复制和评分 -->
     <div class="flex-shrink-0 mb-4 flex justify-between items-center">
       <!-- 真实度评分 -->
@@ -199,4 +199,18 @@ function copyAll() {
 </script>
 
 <style scoped>
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
 </style>

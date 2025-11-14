@@ -55,6 +55,22 @@ function loadData() {
 
 loadData()
 
+// 📏 根据字数设置计算 max_tokens
+// 中文字符约 1.5-2 tokens，考虑格式化和标点，使用 1.8 倍系数
+function getMaxTokens(wordCount = 'medium') {
+  const tokenMap = {
+    'short': 600,        // 200-400字 -> ~600 tokens
+    'medium': 1200,      // 400-800字 -> ~1200 tokens  
+    'long': 1800,        // 800-1200字 -> ~1800 tokens
+    'extra_long': 2400,  // 1200-1600字 -> ~2400 tokens
+    'ultra_long': 3000   // 1600-2000字 -> ~3000 tokens
+  }
+  
+  const tokens = tokenMap[wordCount] || tokenMap['medium']
+  console.log(`📏 字数设置: ${wordCount} -> max_tokens: ${tokens}`)
+  return tokens
+}
+
 // 🤖 多轮AI协作辅助函数
 
 // 生成初始文案（复用现有逻辑）
@@ -64,7 +80,7 @@ async function generateInitialContent(requestBody) {
   console.log('🎨 第一轮：生成初始文案')
   
   // 这里复用现有的生成逻辑，但返回更简洁的结果
-  const { productId, style, keywords, personality, warmth, vulnerability, excitement } = requestBody
+  const { productId, style, keywords, personality, warmth, vulnerability, excitement, wordCount = 'medium' } = requestBody
   
   const products = PRODUCTS
   const product = products.find(p => p.id === productId)
@@ -103,6 +119,7 @@ async function generateInitialContent(requestBody) {
 关键词：${keywords || '无'}`
 
   // 调用AI生成
+  const maxTokens = getMaxTokens(wordCount)
   const resp = await fetch(base + '/chat/completions', {
     method: 'POST',
     headers: {
@@ -118,7 +135,7 @@ async function generateInitialContent(requestBody) {
       temperature: 0.85,
       top_p: 0.7,
       frequency_penalty: 0.3,
-      max_tokens: 800
+      max_tokens: maxTokens
     })
   })
 
@@ -159,7 +176,7 @@ async function generateInitialContent(requestBody) {
           temperature: 0.85,
           top_p: 0.7,
           frequency_penalty: 0.3,
-          max_tokens: 800
+          max_tokens: maxTokens
         }
       },
       output: {
@@ -271,7 +288,7 @@ async function analyzeContentQuality(content) {
 }
 
 // 优化文案内容
-async function optimizeContent(originalContent, analysis) {
+async function optimizeContent(originalContent, analysis, wordCount = 'medium') {
   const startTime = Date.now()
   console.log('✨ 第三轮：优化文案内容')
   
@@ -311,6 +328,7 @@ ${improvementsList}
 
 请输出优化后的完整文案。`
 
+  const maxTokens = getMaxTokens(wordCount)
   const resp = await fetch(base + '/chat/completions', {
     method: 'POST',
     headers: {
@@ -324,7 +342,8 @@ ${improvementsList}
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.7,
-      top_p: 0.8
+      top_p: 0.8,
+      max_tokens: maxTokens
     })
   })
 
@@ -364,7 +383,8 @@ ${improvementsList}
         analysisResult: analysis,
         parameters: {
           temperature: 0.7,
-          top_p: 0.8
+          top_p: 0.8,
+          max_tokens: maxTokens
         }
       },
       output: {
@@ -399,7 +419,8 @@ app.post('/api/test-prompt', async (req, res) => {
       warmth = 7,
       vulnerability = 7, 
       excitement = 6,
-      keywords = ''
+      keywords = '',
+      wordCount = 'medium'
     } = req.body || {}
 
     // 查找产品
@@ -468,7 +489,8 @@ app.post('/api/test-prompt', async (req, res) => {
           warmth,
           vulnerability,
           excitement,
-          keywords
+          keywords,
+          wordCount
         },
         prompts: {
           system: systemPrompt,
@@ -479,7 +501,7 @@ app.post('/api/test-prompt', async (req, res) => {
           temperature: 0.85,
           top_p: 0.7,
           frequency_penalty: 0.3,
-          max_tokens: 800
+          max_tokens: getMaxTokens(wordCount)
         }
       }
     })
@@ -511,7 +533,8 @@ app.post('/api/generate/multi-round', async (req, res) => {
       vulnerability = 6,
       excitement = 6,
       audienceAge = '26-35',
-      contentGoal = 'engagement'
+      contentGoal = 'engagement',
+      wordCount = 'medium'
     } = req.body || {}
     
     // 查找产品信息
@@ -519,6 +542,8 @@ app.post('/api/generate/multi-round', async (req, res) => {
     if (!product) {
       throw new Error(`产品 ${productId} 未找到`)
     }
+    
+    console.log('📏 字数设置:', wordCount)
     
     // 第一步：生成初始文案
     console.log('🎨 第一步：生成初始文案')
@@ -530,7 +555,7 @@ app.post('/api/generate/multi-round', async (req, res) => {
     
     // 第三步：优化文案内容
     console.log('✨ 第三步：优化文案内容')
-    const optimizedResult = await optimizeContent(initialResult.content, analysisResult.analysisResult)
+    const optimizedResult = await optimizeContent(initialResult.content, analysisResult.analysisResult, wordCount)
     
     const totalTime = Date.now() - totalStartTime
     
@@ -683,13 +708,15 @@ app.post('/api/generate/enhanced', async (req, res) => {
       vulnerability = 6,
       excitement = 6,
       audienceAge = '26-35',
-      contentGoal = 'engagement'
+      contentGoal = 'engagement',
+      wordCount = 'medium'
     } = req.body || {}
     
     console.log('🔍 参数验证:')
     console.log('- productId:', productId)
     console.log('- style:', style)
     console.log('- personality:', personality)
+    console.log('- wordCount:', wordCount)
     console.log('- warmth:', warmth)
     
     if (!productId) {
@@ -774,6 +801,7 @@ app.post('/api/generate/enhanced', async (req, res) => {
     console.log('🤖 开始调用AI...')
     const startTime = Date.now()
     
+    const maxTokens = getMaxTokens(wordCount)
     const resp = await fetch(base + '/chat/completions', {
       method: 'POST',
       headers: {
@@ -789,7 +817,7 @@ app.post('/api/generate/enhanced', async (req, res) => {
         temperature: 0.85,        // 提高随机性，减少AI感
         top_p: 0.7,              // 控制输出质量
         frequency_penalty: 0.3,   // 减少重复，增加自然表达
-        max_tokens: 800          // 充分的输出长度
+        max_tokens: maxTokens    // 根据前端字数设置动态调整
       })
     })
     

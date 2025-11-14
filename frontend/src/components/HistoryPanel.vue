@@ -153,7 +153,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, defineEmits } from 'vue'
-import { getHistory, deleteHistory, batchDeleteHistory, getHistoryStats, getProducts } from '../api/index.js'
+import { getHistory, deleteHistory, batchDeleteHistory, getHistoryStats } from '../api/index.js'
 
 // 定义事件
 const emit = defineEmits(['select-record'])
@@ -163,7 +163,6 @@ const loading = ref(false)
 const loadingMore = ref(false)
 const historyList = ref([])
 const selectedRecord = ref(null)
-const productList = ref([])
 const selectedProduct = ref('')
 
 const pagination = reactive({
@@ -180,6 +179,20 @@ const stats = reactive({
   files: []
 })
 
+// 从历史记录中提取产品列表（去重）
+const productList = computed(() => {
+  const products = new Map()
+  historyList.value.forEach(record => {
+    if (record.productInfo?.id && record.productInfo?.name) {
+      products.set(record.productInfo.id, {
+        id: record.productInfo.id,
+        name: record.productInfo.name
+      })
+    }
+  })
+  return Array.from(products.values())
+})
+
 // 筛选后的历史记录列表
 const filteredHistoryList = computed(() => {
   if (!selectedProduct.value) {
@@ -193,23 +206,13 @@ const filteredHistoryList = computed(() => {
 // 产品筛选变化处理
 const onProductFilterChange = () => {
   console.log('📦 产品筛选:', selectedProduct.value || '全部产品')
+  console.log('📦 可用产品列表:', productList.value)
   // 筛选后自动选择第一条记录（如果有）
   if (filteredHistoryList.value.length > 0) {
     selectRecord(filteredHistoryList.value[0])
   } else {
     selectedRecord.value = null
     emit('select-record', null)
-  }
-}
-
-// 加载产品列表
-const loadProducts = async () => {
-  try {
-    const response = await getProducts()
-    productList.value = response.products || []
-    console.log('📦 产品列表加载完成:', productList.value.length, '个产品')
-  } catch (error) {
-    console.error('❌ 加载产品列表失败:', error)
   }
 }
 
@@ -365,7 +368,6 @@ const clearAllHistory = async () => {
 
 // 组件挂载时加载数据
 onMounted(() => {
-  loadProducts()
   refreshHistory()
 })
 
