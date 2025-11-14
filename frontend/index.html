@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XHS Content Matrix - 小红书内容矩阵生成器</title>
+    <style>
+      /* 优化字体渲染 */
+      body {
+        font-family: 'Inter', 'PingFang SC', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      /* 全局过渡效果 */
+      * {
+        transition: background-color 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+      }
+      
+      /* 优化滚动条样式 */
+      ::-webkit-scrollbar { 
+        width: 4px; 
+      }
+      ::-webkit-scrollbar-thumb { 
+        background: #888; 
+        border-radius: 4px; 
+      }
+      ::-webkit-scrollbar-thumb:hover { 
+        background: #555; 
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

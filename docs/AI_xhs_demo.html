@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XHS 内容矩阵 (AI版)</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // --- 配置 Tailwind ---
+        tailwind.config = {
+            darkMode: 'class', // 启用 'class' 策略进行暗黑模式切换
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#10B981', // 活力绿 (暗)
+                        'primary-light': '#047857', // 沉稳深绿 (亮)
+                    },
+                    ringColor: {
+                        'primary-dark': '#10B981',
+                        'primary-light': '#047857',
+                    },
+                    animation: {
+                        'pulse-green-dark': 'pulse-dark 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-green-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'pulse-dark': {
+                            '0%, 100%': { opacity: 1, backgroundColor: '#10B981' },
+                            '50%': { opacity: .5, backgroundColor: '#059669' },
+                        },
+                        'pulse-light': {
+                            '0%, 100%': { opacity: 1, backgroundColor: '#047857' },
+                            '50%': { opacity: .5, backgroundColor: '#059669' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        * {
+            transition: background-color 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+        }
+        /* 允许滚动条 (用于响应式) */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+
+<!-- 
+  主体 Body
+  - 优化响应式：移除了 overflow-hidden
+-->
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+
+    <!-- 
+      主容器: 双栏布局
+      - 优化响应式: flex-col (移动端堆叠) md:flex-row (桌面端并排)
+    -->
+    <div class="flex flex-col md:flex-row min-h-screen">
+
+        <!-- ========================== -->
+        <!-- 左栏：控制台 (Control Panel) -->
+        <!-- ========================== -->
+        <!-- 
+          优化响应式: 
+          - w-full (移动端全宽) md:w-1/3 lg:w-1/4 (桌面端侧栏)
+          - md:h-screen (桌面端全高)
+          - border-b (移动端底边框) md:border-b-0 md:border-r (桌面端右边框)
+        -->
+        <aside class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0 flex flex-col p-6 bg-white dark:bg-gray-900 border-b md:border-b-0 md:border-r border-gray-300 dark:border-gray-700 shadow-lg md:h-screen overflow-y-auto">
+            
+            <!-- 1. 顶部：标题和主题切换 -->
+            <div class="flex items-center justify-between mb-6 flex-shrink-0">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    XHS Content Matrix
+                </h1>
+                <!-- 主题切换按钮 -->
+                <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-primary-light dark:ring-primary-dark">
+                    <svg id="theme-icon-dark" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </button>
+            </div>
+
+            <!-- 滚动容器 (移动端需要) -->
+            <div class="flex-grow flex flex-col">
+                <!-- 2. 产品选择 (ProductSelector) -->
+                <div class="mb-4">
+                    <label for="product-select" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">
+                        1. 选择产品 (8个)
+                    </label>
+                    <select id="product-select" class="w-full p-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-transparent">
+                        <option value="" disabled selected>请选择一个产品...</option>
+                        <!-- 选项将由 JS 动态填充 -->
+                    </select>
+                </div>
+
+                <!-- 3. 角度选择 (AngleSelector) -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        2. 选择文案角度
+                    </label>
+                    <div id="angle-container" class="flex flex-wrap gap-2">
+                        <button data-angle="story" class="angle-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">故事向</button>
+                        <button data-angle="review" class="angle-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">测评向</button>
+                        <button data-angle="dry_goods" class="angle-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">干货向</button>
+                        <button data-angle="pain_point" class="angle-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">痛点向</button>
+                        <button data-angle="education" class="angle-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">教育向</button>
+                    </div>
+                </div>
+
+                <!-- 4. 生成按钮 (GenerateButton) -->
+                <div class="mt-auto"> <!-- 推到底部 -->
+                    <button id="generate-btn" class="w-full text-lg font-bold py-3 px-4 rounded-md shadow-lg transition-all duration-150 ease-in-out
+                                bg-primary-light hover:bg-green-600 text-white
+                                dark:bg-primary-dark dark:hover:bg-green-400 dark:text-black
+                                focus:outline-none focus:ring-4 focus:ring-primary-light dark:focus:ring-primary-dark
+                                disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed">
+                        <span id="btn-text">🚀 AI 智能生成</span>
+                        <!-- 加载中 (Pulse) 动画 -->
+                        <span id="btn-loading" class="hidden w-full h-full animate-pulse-green-light dark:animate-pulse-green-dark">
+                            AI 思考中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ========================== -->
+        <!-- 右栏：结果展示 (Generation Zone) -->
+        <!-- ========================== -->
+        <!-- 
+          优化响应式: 
+          - w-full (移动端全宽) md:w-2/3 lg:w-3/4 (桌面端主内容)
+          - md:h-screen (桌面端全高)
+          - overflow-y-auto (独立滚动)
+        -->
+        <main class="w-full md:w-2/3 lg:w-3/4 flex flex-col p-6 md:p-10 bg-gray-50 dark:bg-gray-800 md:h-screen overflow-y-auto">
+            
+            <!-- 占位符 (Placeholder) -->
+            <div id="placeholder" class="m-auto text-center text-gray-500 dark:text-gray-400">
+                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <h2 class="mt-2 text-lg font-medium">// 等待生成</h2>
+                <p class="mt-1 text-sm">在左侧选择产品和角度后点击生成...</p>
+            </div>
+
+            <!-- 结果展示区 (默认隐藏) -->
+            <div id="results" class="hidden h-full flex flex-col">
+                
+                <!-- 复制按钮 -->
+                <div class="flex-shrink-0 mb-4 text-right">
+                    <button id="copy-btn" class="
+                        px-4 py-2 text-sm font-medium rounded-md border
+                        border-primary-light text-primary-light hover:bg-primary-light hover:text-white
+                        dark:border-primary-dark dark:text-primary-dark dark:hover:bg-primary-dark dark:hover:text-black
+                        focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark
+                    ">
+                        复制全部内容
+                    </button>
+                </div>
+                
+                <!-- 标题 -->
+                <div class="flex-shrink-0 mb-4">
+                    <label for="result-title" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">
+                        AI 生成标题
+                    </label>
+                    <textarea 
+                        id="result-title" 
+                        rows="2" 
+                        class="w-full p-3 font-mono text-lg rounded-md shadow-sm 
+                               border border-gray-300 dark:border-gray-700 
+                               bg-white dark:bg-gray-900 
+                               text-primary-light dark:text-primary-dark 
+                               focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-transparent"
+                    ></textarea>
+                </div>
+
+                <!-- 正文 -->
+                <div class="flex-grow flex flex-col">
+                    <label for="result-body" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1">
+                        AI 生成正文 (含Tags)
+                    </label>
+                    <textarea 
+                        id="result-body" 
+                        class="w-full h-full flex-grow p-3 font-mono rounded-md shadow-sm 
+                               border border-gray-300 dark:border-gray-700 
+                               bg-white dark:bg-gray-900 
+                               text-primary-light dark:text-primary-dark 
+                               focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-transparent"
+                    ></textarea>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ========================== -->
+    <!-- JavaScript 逻辑 -->
+    <!-- ========================== -->
+    <script>
+        // --- 1. AI 集成：Gemini API 配置 ---
+        const apiKey = ""; // 留空，将自动注入
+        const apiModel = "gemini-2.5-flash-preview-09-2025";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${apiKey}`;
+
+        // AI 系统提示词
+        const systemPrompt = `
+你是一个顶尖的小红书文案专家，尤其擅长为留学生和职场新人撰写“朋友分享”口吻的种草文案。
+你的风格是热情、真诚、有感染力的，像闺蜜一样在聊天。
+你的任务是根据用户提供的“产品信息”、“核心卖点”和“文案角度”来创作内容。
+
+规则：
+1. 大量使用 emoji 来增加文案的生动性和可读性。
+2. 文案结尾必须包含 5-7 个相关的小红书 #hashtags。
+3. 你的回复**必须**严格遵循以下格式，不要有任何多余的解释和寒暄：
+标题：[这里是文案标题]
+
+正文：[这里是文案正文，包含emoji和hashtags]
+`;
+
+        // --- 2. 升级版模拟数据 (基于您上传的 .txt 文件) ---
+        const mockProducts = [
+            { 
+                id: "p0", 
+                name: "社恐程度专业测评系统",
+                description: "基于国际权威SAS社交焦虑量表，帮你准确了解自己的社交状态。",
+                sellingPoints: ["35道精心设计的题目", "8个核心维度", "专属社恐类型画像和详细解读", "5分钟完成，1秒生成报告", "提供针对性改善方案"]
+            },
+            { 
+                id: "p1", 
+                name: "托福真题 (更新至2025.11.08)",
+                description: "考托全套自学资料，包更新6个月。",
+                sellingPoints: ["真题更新至2025.11.08", "听力带重听题+音频+原文", "阅读支持题目搜索", "写作和口语带范文", "赠送TPO1-75全套", "赠送模拟软件(win&mac)"]
+            },
+            { 
+                id: "p2", 
+                name: "72套 动态PPT模板",
+                description: "高级动效，效果丝滑。",
+                sellingPoints: ["共72套", "每套1-15页", "动态效果丝滑", "可以自己替换图片文字", "拍下即发"]
+            },
+            { 
+                id: "p3", 
+                name: "2026托福13套真题 (改革版)",
+                description: "针对2026改革新题，含答案音频。",
+                sellingPoints: ["6套TPO-Pack试题", "4套学生/老师样题", "3套线下体验日试题", "均为改革新题", "赠送托福词汇大礼包"]
+            },
+            { 
+                id: "p4", 
+                name: "莫沫114分资料库",
+                description: "学姐自用，从79分到114分的30+核心文件。",
+                sellingPoints: ["学科单词(背5-6遍)", "魔鬼精听法(两周见效)", "11种题型做题技巧", "莫沫笔记流(攻克小结题)", "Vince学术写作模板", "Fiona口语模板", "标注了使用顺序和方法"]
+            },
+            { 
+                id: "p5", 
+                name: "UnLock 第三版教材 (1-5级全套)",
+                description: "2025最新第三版，带答案。",
+                sellingPoints: ["1-5级全套", "学生用书+教师用书", "带全套音频+视频", "带单词表和model答案", "PDF文字精准复制"]
+            },
+            { 
+                id: "p6", 
+                name: "剑桥unlock教材 (全套带课件)",
+                description: "basic-level5 共6个级别，带外教课。",
+                sellingPoints: ["学生用书+教师用书", "音频+视频+白板软件", "PPT课件(1-4)", "单元测试+期中期末", "L1-L3外教视频课"]
+            },
+            { 
+                id: "p7", 
+                name: "第三版国家地理Reading Explorer",
+                description: "RE三版精讲课，全套6级别。",
+                sellingPoints: ["F-5共6个级别", "学生书+教师书+精讲课视频", "乐学无忧/joshua/猫刀等多个外教课", "词汇拓展+语法巩固+阅读技巧", "国家地理视频拓展视野"]
+            }
+        ];
+
+        // --- 状态变量 ---
+        let selectedAngle = '';
+        let selectedProductId = '';
+        let isLoading = false;
+
+        // --- DOM 元素引用 ---
+        const dom = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('theme-toggle'),
+            iconDark: document.getElementById('theme-icon-dark'),
+            iconLight: document.getElementById('theme-icon-light'),
+            productSelect: document.getElementById('product-select'),
+            angleContainer: document.getElementById('angle-container'),
+            angleBtns: document.querySelectorAll('.angle-btn'),
+            generateBtn: document.getElementById('generate-btn'),
+            btnText: document.getElementById('btn-text'),
+            btnLoading: document.getElementById('btn-loading'),
+            placeholder: document.getElementById('placeholder'),
+            results: document.getElementById('results'),
+            resultTitle: document.getElementById('result-title'),
+            resultBody: document.getElementById('result-body'),
+            copyBtn: document.getElementById('copy-btn')
+        };
+
+        // --- 3. 主题切换逻辑 ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                dom.html.classList.add('dark');
+                dom.iconDark.classList.remove('hidden'); // 显示太阳
+                dom.iconLight.classList.add('hidden'); // 隐藏月亮
+            } else {
+                dom.html.classList.remove('dark');
+                dom.iconDark.classList.add('hidden'); // 隐藏太阳
+                dom.iconLight.classList.remove('hidden'); // 显示月亮
+            }
+        }
+
+        dom.themeToggle.addEventListener('click', () => {
+            const currentTheme = dom.html.classList.contains('dark') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        // 页面加载时检查本地存储
+        // 优化：默认使用 'light' 模式，以展示深绿色 UI
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+
+        // --- 4. 填充产品下拉框 ---
+        function populateProducts() {
+            mockProducts.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = product.name;
+                dom.productSelect.appendChild(option);
+            });
+        }
+        dom.productSelect.addEventListener('change', (e) => {
+            selectedProductId = e.target.value;
+            checkFormState();
+        });
+
+
+        // --- 5. 角度选择逻辑 ---
+        dom.angleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                dom.angleBtns.forEach(b => {
+                    b.classList.remove('bg-primary-light', 'dark:bg-primary-dark', 'text-white', 'dark:text-black');
+                    b.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                });
+                
+                btn.classList.add('bg-primary-light', 'dark:bg-primary-dark', 'text-white', 'dark:text-black');
+                btn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                
+                selectedAngle = btn.dataset.angle;
+                checkFormState();
+            });
+        });
+
+
+        // --- 6. 检查表单状态 (启用/禁用按钮) ---
+        function checkFormState() {
+            if (selectedProductId && selectedAngle && !isLoading) {
+                dom.generateBtn.disabled = false;
+            } else {
+                dom.generateBtn.disabled = true;
+            }
+        }
+        checkFormState(); // 初始检查
+
+
+        // --- 7. (新) API 请求与重试 (fetchWithRetry) ---
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    // 自动处理 429 (Too Many Requests) 等可重试错误
+                    if (response.status === 429 || response.status >= 500) {
+                        throw new Error(`Retryable error: ${response.status}`);
+                    }
+                    // 对于 400/404 等客户端错误，直接抛出，不重试
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'API 请求失败');
+
+                } catch (error) {
+                    if (i === retries - 1) throw error; // 最后一次重试失败，抛出错误
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                }
+            }
+        }
+
+        // --- 8. (新) AI 生成文案逻辑 ---
+        async function generateCopy() {
+            if (!selectedProductId || !selectedAngle) return;
+
+            // a. 进入加载状态
+            isLoading = true;
+            checkFormState();
+            dom.btnText.classList.add('hidden');
+            dom.btnLoading.classList.remove('hidden');
+            dom.results.classList.add('hidden');
+            dom.placeholder.classList.remove('hidden');
+            dom.resultTitle.value = ""; // 清空上次结果
+            dom.resultBody.value = ""; // 清空上次结果
+
+            try {
+                // b. 准备 API 请求
+                const product = mockProducts.find(p => p.id === selectedProductId);
+                if (!product) throw new Error("未找到产品数据");
+                
+                const angleText = dom.angleContainer.querySelector(`[data-angle="${selectedAngle}"]`).textContent;
+
+                // 组装用户提示词
+                const userQuery = `
+请为我生成一篇小红书文案：
+- 产品名称：${product.name}
+- 产品描述：${product.description}
+- 核心卖点：${product.sellingPoints.join('，')}
+- 文案角度：${angleText}
+`;
+
+                const payload = {
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    contents: [
+                        { parts: [{ text: userQuery }] }
+                    ]
+                };
+
+                // c. 发送 API 请求 (带重试)
+                const result = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // d. 解析 AI 回复
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) {
+                    throw new Error("AI 未返回有效内容");
+                }
+
+                // e. 使用正则表达式拆分标题和正文
+                const titleMatch = text.match(/标题：(.*?)\n/);
+                const bodyMatch = text.match(/正文：([\s\S]*)/);
+
+                let title = `AI 生成标题 (未匹配到格式)`;
+                let body = text; // 默认显示全部内容
+
+                if (titleMatch && titleMatch[1]) {
+                    title = titleMatch[1].trim();
+                }
+                if (bodyMatch && bodyMatch[1]) {
+                    body = bodyMatch[1].trim();
+                }
+
+                // f. 显示结果
+                dom.resultTitle.value = title;
+                dom.resultBody.value = body;
+                dom.placeholder.classList.add('hidden');
+                dom.results.classList.remove('hidden');
+                dom.results.classList.add('flex'); // 确保 flex 生效
+
+            } catch (error) {
+                console.error('AI 生成失败:', error);
+                alert(`AI 生成失败: ${error.message}\n\n请检查网络连接或 API 配置。`);
+                dom.resultBody.value = `生成失败：\n${error.message}\n\n请重试...`;
+                dom.placeholder.classList.add('hidden');
+                dom.results.classList.remove('hidden');
+                dom.results.classList.add('flex');
+            } finally {
+                // g. 退出加载状态
+                isLoading = false;
+                checkFormState();
+                dom.btnText.classList.remove('hidden');
+                dom.btnLoading.classList.add('hidden');
+            }
+        }
+        
+        // 绑定新的 AI 生成函数
+        dom.generateBtn.addEventListener('click', generateCopy);
+
+
+        // --- 9. 复制到剪贴板 ---
+        dom.copyBtn.addEventListener('click', () => {
+            const fullText = `标题：${dom.resultTitle.value}\n\n${dom.resultBody.value}`;
+            
+            navigator.clipboard.writeText(fullText).then(() => {
+                const originalText = dom.copyBtn.textContent;
+                dom.copyBtn.textContent = '复制成功!';
+                dom.copyBtn.classList.add('text-green-500', 'dark:text-green-400');
+                setTimeout(() => {
+                    dom.copyBtn.textContent = originalText;
+                    dom.copyBtn.classList.remove('text-green-500', 'dark:text-green-400');
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败: ', err);
+                alert('复制失败，请手动复制。');
+            });
+        });
+
+        // --- 启动 ---
+        populateProducts();
+
+    </script>
+</body>
+</html>

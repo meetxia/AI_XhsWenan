@@ -1,0 +1,126 @@
+{
+  "presets": {
+    "cautious_education": {
+      "name": "谨慎教育风格",
+      "personality": "cautious_rational",
+      "warmth": 5,
+      "vulnerability": 4,
+      "excitement": 4,
+      "audienceAge": "26-35",
+      "contentGoal": "trust_building",
+      "description": "适合教育类产品，理性客观"
+    },
+    "enthusiastic_lifestyle": {
+      "name": "热情生活风格", 
+      "personality": "enthusiastic_sharer",
+      "warmth": 8,
+      "vulnerability": 7,
+      "excitement": 8,
+      "audienceAge": "18-25",
+      "contentGoal": "engagement",
+      "description": "适合生活类产品，热情分享"
+    },
+    "authentic_review": {
+      "name": "真实测评风格",
+      "personality": "authentic_experiencer", 
+      "warmth": 7,
+      "vulnerability": 8,
+      "excitement": 6,
+      "audienceAge": "26-35",
+      "contentGoal": "trust_building",
+      "description": "适合产品测评，真实可信"
+    },
+    "professional_analysis": {
+      "name": "专业分析风格",
+      "personality": "professional_reviewer",
+      "warmth": 4,
+      "vulnerability": 3,
+      "excitement": 4,
+      "audienceAge": "36+",
+      "contentGoal": "conversion",
+      "description": "适合专业产品，客观分析"
+    },
+    "bestie_recommendation": {
+      "name": "闺蜜推荐风格",
+      "personality": "bestie_chat",
+      "warmth": 9,
+      "vulnerability": 8,
+      "excitement": 9,
+      "audienceAge": "18-25", 
+      "contentGoal": "engagement",
+      "description": "适合个人推荐，亲密自然"
+    }
+  },
+
+  "parameterRanges": {
+    "warmth": {
+      "min": 1,
+      "max": 10,
+      "description": "情感温度，1=冷静客观，10=热情洋溢",
+      "recommendations": {
+        "education": 5,
+        "lifestyle": 8,
+        "tools": 6,
+        "health": 7
+      }
+    },
+    "vulnerability": {
+      "min": 1,
+      "max": 10,
+      "description": "真实度，1=完美无缺，10=坦露缺点",
+      "recommendations": {
+        "trust_building": 8,
+        "engagement": 7,
+        "conversion": 5
+      }
+    },
+    "excitement": {
+      "min": 1,
+      "max": 10,
+      "description": "兴奋度，1=平静叙述，10=激动分享",
+      "recommendations": {
+        "18-25": 8,
+        "26-35": 6,
+        "36+": 4
+      }
+    }
+  },
+
+  "contentLength": {
+    "short": {
+      "words": "150-200",
+      "paragraphs": "2-3",
+      "points": "2-3"
+    },
+    "medium": {
+      "words": "200-300", 
+      "paragraphs": "3-4",
+      "points": "3-4"
+    },
+    "long": {
+      "words": "300-500",
+      "paragraphs": "4-6", 
+      "points": "4-5"
+    }
+  },
+
+  "qualityMetrics": {
+    "authenticity": {
+      "personal_experience": 0.3,
+      "specific_details": 0.25,
+      "emotional_honesty": 0.25,
+      "vulnerability_admission": 0.2
+    },
+    "engagement": {
+      "interaction_elements": 0.4,
+      "emotional_connection": 0.3,
+      "call_to_action": 0.3
+    },
+    "readability": {
+      "sentence_length": 0.25,
+      "paragraph_structure": 0.25,
+      "flow_transition": 0.25,
+      "emoji_usage": 0.25
+    }
+  }
+}

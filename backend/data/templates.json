@@ -1,0 +1,110 @@
+{
+  "story": [
+    {
+      "titleTpl": "从尝试到上手：{{name}}真实体验",
+      "introTpl": "我在最焦虑的时候选择了{{name}}，它更像一面镜子",
+      "pointTpl": "选择它的原因：{{point}}",
+      "summaryTpl": "改变来自理解，{{audience}}可以更稳健地迈出第一步",
+      "emojis": ["🙂", "✅"],
+      "tagPool": ["故事向", "真实体验", "成长记录"]
+    },
+    {
+      "titleTpl": "一次决定改变节奏：{{name}}",
+      "introTpl": "起初我并不确定，直到我用了{{name}}并看到了差异",
+      "pointTpl": "我感受到的亮点：{{point}}",
+      "summaryTpl": "稳定的进步最动人，愿你也能遇到合适的工具",
+      "emojis": ["✨", "🎯"],
+      "tagPool": ["体验分享", "使用感受", "效率提升"]
+    }
+  ],
+  "review": [
+    {
+      "titleTpl": "数据视角评测：{{name}}覆盖深度",
+      "introTpl": "从数据与范围来看，{{name}}的可用性较高",
+      "pointTpl": "核心项：{{point}}",
+      "summaryTpl": "更适合{{audience}}，建议按步骤使用与验证",
+      "emojis": ["📊", "🔎"],
+      "tagPool": ["测评", "数据", "覆盖度"]
+    },
+    {
+      "titleTpl": "轻量深测：{{name}}关键指标盘点",
+      "introTpl": "从套数与级别到更新日期，{{name}}信息较完整",
+      "pointTpl": "样本观察：{{point}}",
+      "summaryTpl": "选择时更关注匹配度与稳定性",
+      "emojis": ["🧪", "📈"],
+      "tagPool": ["评测向", "样本观察", "稳定性"]
+    }
+  ],
+  "dry_goods": [
+    {
+      "titleTpl": "快速上手指南：{{name}}",
+      "introTpl": "用更简单的方式把{{name}}用起来",
+      "pointTpl": "步骤：{{point}}",
+      "summaryTpl": "保持节奏与复盘，效率更稳",
+      "emojis": ["⚙️", "📚"],
+      "tagPool": ["干货", "上手", "方法论"]
+    },
+    {
+      "titleTpl": "实用技巧合集：{{name}}",
+      "introTpl": "整理了一组更常用的操作",
+      "pointTpl": "技巧：{{point}}",
+      "summaryTpl": "按需取用更合适",
+      "emojis": ["🧰", "✅"],
+      "tagPool": ["技巧", "清单", "执行"]
+    }
+  ],
+  "education": [
+    {
+      "titleTpl": "体系解析：{{name}}学习路径",
+      "introTpl": "从结构与资源来看，{{name}}更完整",
+      "pointTpl": "要点：{{point}}",
+      "summaryTpl": "理解结构有助于更快掌握",
+      "emojis": ["📚", "🧠"],
+      "tagPool": ["科普", "体系", "路径"]
+    },
+    {
+      "titleTpl": "为什么选择：{{name}}的背后逻辑",
+      "introTpl": "以能力维度来拆解{{name}}",
+      "pointTpl": "维度：{{point}}",
+      "summaryTpl": "结构化理解让决策更清晰",
+      "emojis": ["🔍", "🎓"],
+      "tagPool": ["教育向", "逻辑", "理解"]
+    }
+  ],
+  "pain_point": [
+    {
+      "titleTpl": "这些问题你遇到过吗：{{name}}来帮忙",
+      "introTpl": "如果你也为这些困扰，{{name}}或许是解决方案",
+      "pointTpl": "解决痛点：{{point}}",
+      "summaryTpl": "针对性解决，{{audience}}的理想选择",
+      "emojis": ["😤", "✅"],
+      "tagPool": ["痛点", "解决方案", "针对性"]
+    },
+    {
+      "titleTpl": "踩坑经历分享：{{name}}避坑指南",
+      "introTpl": "用过很多工具后，才发现{{name}}最靠谱",
+      "pointTpl": "避开的坑：{{point}}",
+      "summaryTpl": "少走弯路，直接选对的",
+      "emojis": ["⚠️", "🎯"],
+      "tagPool": ["避坑", "经验分享", "选择"]
+    }
+  ],
+  "friends": [
+    {
+      "titleTpl": "别盲撞了：{{name}}更省心",
+      "introTpl": "我用过，确实更稳一些",
+      "pointTpl": "我会推荐的点：{{point}}",
+      "summaryTpl": "合适就上，别纠结",
+      "emojis": ["🤝", "✨"],
+      "tagPool": ["朋友推荐", "不踩坑", "省心"]
+    },
+    {
+      "titleTpl": "给你个靠谱的：{{name}}",
+      "introTpl": "这款我自己上手过",
+      "pointTpl": "靠谱之处：{{point}}",
+      "summaryTpl": "需要的话直接私信",
+      "emojis": ["👀", "👍"],
+      "tagPool": ["推荐向", "口碑", "私信"]
+    }
+  ]
+}
