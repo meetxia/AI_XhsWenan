@@ -190,6 +190,31 @@
         </div>
       </div>
 
+      <!-- 多轮AI优化开关 -->
+      <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              🤖 多轮AI优化
+            </label>
+            <span class="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+              {{ enableMultiRound ? '已启用' : '已关闭' }}
+            </span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="enableMultiRound"
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+          </label>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          开启后将经过评估AI分析和优化AI改进，生成质量更高但耗时更长
+        </p>
+      </div>
+
       <!-- 重置按钮 -->
       <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
         <button
@@ -229,6 +254,7 @@ const excitement = ref(6)
 const audienceAge = ref('26-35')
 const contentGoal = ref('engagement')
 const wordCount = ref('short')
+const enableMultiRound = ref(false)
 
 // 选项数据
 const audienceOptions = [
@@ -300,7 +326,8 @@ const currentParams = computed(() => ({
   excitement: excitement.value,
   audienceAge: audienceAge.value,
   contentGoal: contentGoal.value,
-  wordCount: wordCount.value
+  wordCount: wordCount.value,
+  enableMultiRound: enableMultiRound.value
 }))
 
 // 监听参数变化，向父组件发送更新
@@ -358,11 +385,12 @@ function resetToDefaults() {
   audienceAge.value = '26-35'
   contentGoal.value = 'engagement'
   wordCount.value = 'short'
+  enableMultiRound.value = false
 }
 
 // 初始化从props加载数据
 if (props.modelValue) {
-  const { personality: p, warmth: w, vulnerability: v, excitement: e, audienceAge: a, contentGoal: c, wordCount: wc } = props.modelValue
+  const { personality: p, warmth: w, vulnerability: v, excitement: e, audienceAge: a, contentGoal: c, wordCount: wc, enableMultiRound: emr } = props.modelValue
   if (p) personality.value = p
   if (w) warmth.value = w
   if (v) vulnerability.value = v
@@ -370,6 +398,7 @@ if (props.modelValue) {
   if (a) audienceAge.value = a
   if (c) contentGoal.value = c
   if (wc) wordCount.value = wc
+  if (emr !== undefined) enableMultiRound.value = emr
 }
 </script>
 

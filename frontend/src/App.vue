@@ -57,21 +57,104 @@
           </div>
         </aside>
         
-        <!-- 右栏：结果展示 (Generation Zone) -->
-        <main class="w-full md:w-3/5 lg:w-2/3 flex flex-col p-6 md:p-10 bg-gray-50 dark:bg-gray-800 md:h-screen xl:h-[90vh] overflow-y-auto">
+        <!-- 右栏：结果展示与历史记录 (Generation Zone) -->
+        <main class="w-full md:w-3/5 lg:w-2/3 flex flex-col bg-gray-50 dark:bg-gray-800 md:h-screen xl:h-[90vh]">
           
-          <!-- 占位符 -->
-          <div v-if="!result.title && !loading" class="m-auto text-center text-gray-500 dark:text-gray-400">
-            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h2 class="mt-2 text-lg font-medium">// 等待生成</h2>
-            <p class="mt-1 text-sm">在左侧选择产品和角度后点击生成...</p>
+          <!-- 顶部标签切换 -->
+          <div class="flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <button
+              @click="activeTab = 'generate'"
+              :class="[
+                'flex-1 py-3 px-4 text-sm font-medium transition-colors',
+                activeTab === 'generate' 
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-white dark:bg-gray-900' 
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              ]"
+            >
+              🎨 AI生成
+            </button>
+            <button
+              @click="activeTab = 'history'"
+              :class="[
+                'flex-1 py-3 px-4 text-sm font-medium transition-colors',
+                activeTab === 'history' 
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-white dark:bg-gray-900' 
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              ]"
+            >
+              📚 单轮历史
+            </button>
+            <button
+              @click="activeTab = 'multi-round-history'"
+              :class="[
+                'flex-1 py-3 px-4 text-sm font-medium transition-colors',
+                activeTab === 'multi-round-history' 
+                  ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400 bg-white dark:bg-gray-900' 
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              ]"
+            >
+              🚀 多轮优化
+            </button>
           </div>
-          
-          <!-- 结果展示区 -->
-          <div v-if="result.title" class="h-full flex flex-col">
-            <ResultDisplay :result="result" :loading="loading" />
+
+          <!-- 标签内容区域 -->
+          <div class="flex-1 overflow-hidden">
+            
+            <!-- AI生成标签页 -->
+            <div v-show="activeTab === 'generate'" class="h-full p-6 md:p-10 overflow-y-auto">
+              <!-- 占位符 -->
+              <div v-if="!result.title && !loading" class="m-auto text-center text-gray-500 dark:text-gray-400">
+                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h2 class="mt-2 text-lg font-medium">// 等待生成</h2>
+                <p class="mt-1 text-sm">在左侧选择产品和角度后点击生成...</p>
+              </div>
+              
+              <!-- 结果展示区 -->
+              <div v-if="result.title" class="h-full flex flex-col">
+                <ResultDisplay :result="result" :loading="loading" />
+              </div>
+            </div>
+
+            <!-- 单轮历史记录标签页 -->
+            <div v-show="activeTab === 'history'" class="h-full flex">
+              <!-- 历史记录列表 -->
+              <div class="w-1/2 border-r border-gray-200 dark:border-gray-700">
+                <HistoryPanel 
+                  ref="historyPanelRef"
+                  @select-record="onSelectHistoryRecord" 
+                />
+              </div>
+              
+              <!-- 历史记录详情 -->
+              <div class="w-1/2">
+                <HistoryDetail 
+                  :record="selectedHistoryRecord" 
+                  @regenerate="onRegenerateFromHistory"
+                />
+              </div>
+            </div>
+
+            <!-- 多轮优化历史记录标签页 -->
+            <div v-show="activeTab === 'multi-round-history'" class="h-full flex">
+              <!-- 多轮优化历史记录列表 -->
+              <div class="w-1/2 border-r border-gray-200 dark:border-gray-700">
+                <MultiRoundHistoryPanel 
+                  ref="multiRoundHistoryPanelRef"
+                  @select-record="onSelectMultiRoundRecord" 
+                />
+              </div>
+              
+              <!-- 多轮优化历史记录详情 -->
+              <div class="w-1/2">
+                <MultiRoundHistoryDetail 
+                  :record="selectedMultiRoundRecord" 
+                  @regenerate="onRegenerateFromMultiRoundHistory"
+                />
+              </div>
+            </div>
+
           </div>
         </main>
       </div>
@@ -86,6 +169,10 @@ import ProductSelector from './components/ProductSelector.vue'
 import AngleSelector from './components/AngleSelector.vue'
 import AdvancedControls from './components/AdvancedControls.vue'
 import ResultDisplay from './components/ResultDisplay.vue'
+import HistoryPanel from './components/HistoryPanel.vue'
+import HistoryDetail from './components/HistoryDetail.vue'
+import MultiRoundHistoryPanel from './components/MultiRoundHistoryPanel.vue'
+import MultiRoundHistoryDetail from './components/MultiRoundHistoryDetail.vue'
 import { generateEnhanced } from './api/index.js'
 
 // 响应式数据
@@ -103,6 +190,13 @@ const advancedParams = ref({
   contentGoal: 'engagement',
   wordCount: 'short'
 })
+
+// 历史记录相关数据
+const activeTab = ref('generate')
+const selectedHistoryRecord = ref(null)
+const selectedMultiRoundRecord = ref(null)
+const historyPanelRef = ref(null)
+const multiRoundHistoryPanelRef = ref(null)
 
 // 窗口宽度响应式计算
 const windowWidth = ref(window.innerWidth)
@@ -152,8 +246,13 @@ const isEnhancedMode = computed(() => {
 })
 
 const generateButtonText = computed(() => {
-  if (loading.value) return '🤖 AI 生成中...'
-  return '🎨 AI 智能生成'
+  if (loading.value) {
+    const isMultiRound = advancedParams.value?.enableMultiRound
+    return isMultiRound ? '🤖 多轮AI优化中...' : '🤖 AI 生成中...'
+  }
+  
+  const isMultiRound = advancedParams.value?.enableMultiRound
+  return isMultiRound ? '🎨 多轮AI优化生成' : '🎨 AI 智能生成'
 })
 
 // AI生成文案函数 - 完全重写确保只走AI路径
@@ -198,12 +297,19 @@ async function onGenerate() {
       wordCount: advancedParams.value.wordCount
     }
     
-    console.log('📤 AI请求参数:', JSON.stringify(aiPayload, null, 2))
-    console.log('📡 调用接口: POST /api/generate/enhanced')
+    // 🎛️ 根据多轮优化开关选择API端点
+    const isMultiRound = advancedParams.value.enableMultiRound
+    const apiEndpoint = isMultiRound 
+      ? '/api/generate/multi-round' 
+      : '/api/generate/enhanced'
     
-    // 🎯 直接调用AI接口 - 无备用方案
+    console.log('📤 AI请求参数:', JSON.stringify(aiPayload, null, 2))
+    console.log('🎛️ 多轮优化模式:', isMultiRound ? '已启用' : '已关闭')
+    console.log(`📡 调用接口: POST ${apiEndpoint}`)
+    
+    // 🎯 调用对应的AI接口
     const startTime = Date.now()
-    const aiResponse = await fetch('http://localhost:3002/api/generate/enhanced', {
+    const aiResponse = await fetch(`http://localhost:3002${apiEndpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -229,6 +335,21 @@ async function onGenerate() {
     console.log('✅ AI生成成功!')
     result.value = aiData
     
+    // 自动切换到生成结果标签页
+    activeTab.value = 'generate'
+    
+    // 如果生成成功且有historyId，刷新相应的历史记录
+    if (aiData.historyId && historyPanelRef.value) {
+      console.log('🔄 刷新单轮历史记录列表')
+      historyPanelRef.value.refreshHistory()
+    }
+    
+    // 如果是多轮优化生成，刷新多轮优化历史记录
+    if (aiData.multiRoundHistoryId && multiRoundHistoryPanelRef.value) {
+      console.log('🔄 刷新多轮优化历史记录列表')
+      multiRoundHistoryPanelRef.value.refreshHistory()
+    }
+    
   } catch (error) {
     console.error('❌ AI生成失败:', error)
     console.log('❌ 错误类型:', error.name)
@@ -253,6 +374,71 @@ async function onGenerate() {
     console.log('🏁 生成流程结束')
     console.log('='.repeat(50))
   }
+}
+
+// 历史记录相关方法
+const onSelectHistoryRecord = (record) => {
+  console.log('📋 选择历史记录:', record?.id)
+  selectedHistoryRecord.value = record
+}
+
+const onRegenerateFromHistory = (params) => {
+  console.log('🔄 从历史记录重新生成:', params)
+  
+  // 设置参数
+  productId.value = params.productId
+  style.value = params.style
+  keywords.value = params.keywords || ''
+  
+  // 设置高级参数
+  advancedParams.value = {
+    personality: params.personality || 'authentic_experiencer',
+    warmth: params.warmth || 7,
+    vulnerability: params.vulnerability || 6,
+    excitement: params.excitement || 6,
+    audienceAge: params.audienceAge || '26-35',
+    contentGoal: params.contentGoal || 'engagement',
+    wordCount: advancedParams.value.wordCount // 保持当前的字数设置
+  }
+  
+  // 切换到生成标签页
+  activeTab.value = 'generate'
+  
+  // 执行生成
+  onGenerate()
+}
+
+// 多轮优化历史记录相关方法
+const onSelectMultiRoundRecord = (record) => {
+  console.log('📋 选择多轮优化历史记录:', record?.id)
+  selectedMultiRoundRecord.value = record
+}
+
+const onRegenerateFromMultiRoundHistory = (params) => {
+  console.log('🔄 从多轮优化历史记录重新生成:', params)
+  
+  // 设置参数
+  productId.value = params.productId
+  style.value = params.style
+  keywords.value = params.keywords || ''
+  
+  // 设置高级参数
+  advancedParams.value = {
+    personality: params.personality || 'authentic_experiencer',
+    warmth: params.warmth || 7,
+    vulnerability: params.vulnerability || 6,
+    excitement: params.excitement || 6,
+    audienceAge: params.audienceAge || '26-35',
+    contentGoal: params.contentGoal || 'engagement',
+    wordCount: advancedParams.value.wordCount, // 保持当前的字数设置
+    enableMultiRound: params.enableMultiRound || false // 保持多轮优化设置
+  }
+  
+  // 切换到生成标签页
+  activeTab.value = 'generate'
+  
+  // 执行生成
+  onGenerate()
 }
 </script>
 

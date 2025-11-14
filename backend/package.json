@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node ./src/server.js",
-    "start": "node ./src/server.js",
+    "dev": "chcp 65001 >nul && node ./src/server.js",
+    "start": "chcp 65001 >nul && node ./src/server.js",
     "check": "node ./scripts/check-config.js"
   },
   "dependencies": {

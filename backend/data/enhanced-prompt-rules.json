@@ -135,10 +135,22 @@
   },
 
   "languageFeatures": {
+    "educationalFillers": {
+      "studyRelated": ["说真的", "我发现", "用了之后", "学完才知道", "刚开始我还担心"],
+      "experienceSharing": ["老实讲", "跟你们说", "我试过", "后来发现", "用下来感觉"],
+      "hesitation": ["怎么说呢", "应该说是", "大概就是", "感觉像是"],
+      "emphasis": ["真的真的", "超级", "特别", "巨"],
+      "frequency": "每6-8句插入1个，模拟真实学习分享"
+    },
+    "educationalScenarios": {
+      "studyTimes": ["昨晚熬夜准备考试时", "周末在图书馆刷题", "考前一个月", "备考期间", "刷题的时候"],
+      "painPoints": ["之前一直卡在这里", "这个问题困扰我很久", "分数一直上不去", "找了很多资料都不行"],
+      "breakthroughs": ["突然开窍了", "那一瞬间明白了", "分数立马提升", "效果立竿见影", "终于找到方法了"]
+    },
     "trendyWords": {
-      "2024": ["绝绝子", "yyds", "破防了", "拿捏了", "氛围感", "松弛感"],
-      "emotions": ["爱了爱了", "太绝了", "我哭了", "救命", "窒息"],
-      "approval": ["真香", "可以的", "冲冲冲", "安排", "必须的"]
+      "2024": ["绝绝子", "yyds", "破防了", "拿捏了"],
+      "emotions": ["爱了", "太绝了", "救命", "哭了"],
+      "approval": ["真香", "可以的", "冲", "安排了"]
     },
     "lifeMetaphors": [
       "就像找到了人生拐杖",
@@ -148,25 +160,45 @@
       "就是那种'相见恨晚'的感觉"
     ],
     "sensoryDescriptions": {
-      "visual": ["一眼就被吸引", "看着就很舒服", "颜值在线"],
-      "tactile": ["手感超棒", "质感很好", "摸起来很舒服"],
-      "emotional": ["心情瞬间好了", "内心很平静", "感觉很安心"]
+      "visual": ["界面很清爽", "排版看着舒服", "资料整理得很清晰", "PDF质量很高"],
+      "tactile": ["操作很流畅", "使用起来很顺手", "系统响应很快"],
+      "emotional": ["学完很有成就感", "内心踏实了", "感觉很充实", "心里有底了"],
+      "usage_rule": "每篇文案包含1个学习相关的感受描述"
+    },
+    "educationalFlaws": {
+      "minorIssues": [
+        "资料有点多，需要时间消化",
+        "刚开始用可能需要适应一下",
+        "内容比较丰富，要有耐心学完",
+        "第一次接触可能觉得有点复杂"
+      ],
+      "personalLimitations": [
+        "可能我基础比较弱，用了一段时间才上手",
+        "我这种懒人都能坚持下来",
+        "刚开始我还怀疑效果，现在真香了",
+        "说实话，我之前买过类似的都没坚持"
+      ],
+      "usage_rule": "当vulnerability参数>=7时，包含1个轻微缺点或个人局限性"
     }
   },
 
   "contentStructure": {
     "openingHooks": {
       "confession": "说个真心话...",
-      "discovery": "昨天发现了个宝藏...",
-      "problem": "最近遇到个头疼的事...",
-      "surprise": "没想到会有这种体验...",
-      "recommendation": "必须安利这个给你们..."
+      "discovery": "昨天发现了个宝藏资料...",
+      "studyProblem": "最近备考遇到个头疼的事...",
+      "breakthrough": "没想到这个资料这么管用...",
+      "scoreImprovement": "分数提升后忍不住要分享...",
+      "recommendation": "必须安利这个学习神器..."
     },
     "paragraphRules": {
-      "maxSentences": 3,
-      "idealSentences": 2,
+      "maxSentences": 4,
+      "idealSentences": "2-3",
+      "allowSingleSentence": true,
       "breathingSpace": true,
-      "emojiFrequency": "1-2 per paragraph"
+      "emojiFrequency": "1-2 per paragraph",
+      "naturalFlow": "优先真实分享感受，而非严格结构",
+      "educationalFocus": "突出学习效果和使用体验"
     },
     "closingPatterns": {
       "question": "你们有什么好推荐吗？",
@@ -205,20 +237,26 @@
     "productType": {
       "education": {
         "warmth": 7,
-        "vulnerability": 6,
-        "personality": "analytical",
+        "vulnerability": 7,
+        "personality": "authentic_experiencer",
+        "narrative": "problemSolution"
+      },
+      "examPrep": {
+        "warmth": 8,
+        "vulnerability": 8,
+        "personality": "cautious",
         "narrative": "transformation"
       },
-      "lifestyle": {
-        "warmth": 8,
-        "vulnerability": 7,
-        "personality": "social", 
+      "studyTools": {
+        "warmth": 6,
+        "vulnerability": 6,
+        "personality": "analytical", 
         "narrative": "discovery"
       },
-      "tools": {
-        "warmth": 6,
-        "vulnerability": 5,
-        "personality": "cautious",
+      "psychTest": {
+        "warmth": 7,
+        "vulnerability": 9,
+        "personality": "social",
         "narrative": "problemSolution"
       }
     },
